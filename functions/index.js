@@ -1,19 +1,13 @@
-const express = require("express");
-const admin = require("firebase-admin");
-
-const app = express();
-app.use(express.json());
-
-const userId = "1";
-const serviceAccount = require("./functions/serviceAccountKey.json");
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-});
+const functions = require('firebase-functions');
+const admin = require('firebase-admin');
+admin.initializeApp();
 
 const db = admin.firestore();
-const usuariosCollection = db.collection("usuarios");
+const usuariosCollection = db.collection('usuarios');
 
-app.get("/agendar", async (req, res) => {
+const userId = '1';
+
+exports.agendar = functions.https.onRequest(async (req, res) => {
   try {
     const nomeUsuario = "João Pedro";
     let doc = await usuariosCollection.doc(userId).get();
@@ -71,7 +65,7 @@ app.get("/agendar", async (req, res) => {
   }
 });
 
-app.get("/check", async (req, res) => {
+exports.check = functions.https.onRequest(async (req, res) => {
   try {
     let doc = await usuariosCollection.doc(userId).get();
 
@@ -118,9 +112,4 @@ app.get("/check", async (req, res) => {
     console.error("Erro ao verificar tempo limite:", error);
     res.status(500).json({ error: "Erro ao verificar tempo limite" });
   }
-});
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Servidor rodando na porta ${PORT}`);
 });
